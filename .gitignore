@@ -1,0 +1,8 @@
+node_modules/
+dist/
+release/
+public/tessdata/
+.DS_Store
+*.tsbuildinfo
+/*.png
+/*.traineddata
