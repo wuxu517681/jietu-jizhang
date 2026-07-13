@@ -1,0 +1,27 @@
+{
+  "name": "截图记账",
+  "short_name": "截图记账",
+  "description": "从付款截图识别账目，区分公司和个人花费。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f6f2e9",
+  "theme_color": "#20352b",
+  "categories": ["finance", "utilities"],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
