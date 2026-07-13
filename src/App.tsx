@@ -142,13 +142,16 @@ function App() {
       setQueue((items) => items.map((item) => item.id === next.id
         ? { ...item, status: 'ready', progress: 1, rawText, parsed }
         : item))
-    }).catch(() => {
+    }).catch((error) => {
+      const timedOut = error instanceof Error && error.message === 'OCR_TIMEOUT'
       setQueue((items) => items.map((item) => item.id === next.id
         ? {
             ...item,
             status: 'error',
             progress: 0,
-            error: '没有识别成功，可以重试或直接手动填写',
+            error: timedOut
+              ? '识别超过 45 秒，已停止；可以重试或直接手动填写'
+              : '没有识别成功，可以重试或直接手动填写',
           }
         : item))
     }).finally(() => {
