@@ -57,7 +57,7 @@ const makeAmountCrop = async (file: File): Promise<Blob | null> => {
 
 const getWorker = () => {
   if (!workerPromise) {
-    const langPath = new URL('tessdata', document.baseURI).href.replace(/\/$/, '')
+    const langPath = new URL('tessdata-fast', document.baseURI).href.replace(/\/$/, '')
     const workerPath = new URL('ocr/worker.min.js', document.baseURI).href
     const corePath = new URL('ocr/tesseract-core-lstm.wasm.js', document.baseURI).href
     workerPromise = createWorker(['chi_sim', 'eng'], OEM.LSTM_ONLY, {
