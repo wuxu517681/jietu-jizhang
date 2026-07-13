@@ -1,4 +1,4 @@
-const CACHE_NAME = 'screenshot-ledger-v1'
+const CACHE_NAME = 'screenshot-ledger-v2'
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -6,6 +6,8 @@ const CORE_ASSETS = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
+  './ocr/worker.min.js',
+  './ocr/tesseract-core-lstm.wasm.js',
   './tessdata/chi_sim.traineddata.gz',
   './tessdata/eng.traineddata.gz',
 ]
