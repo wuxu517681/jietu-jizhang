@@ -150,7 +150,7 @@ function App() {
             status: 'error',
             progress: 0,
             error: timedOut
-              ? '识别超过 45 秒，已停止；可以重试或直接手动填写'
+              ? '识别超过 75 秒，已停止；可以重试或直接手动填写'
               : '没有识别成功，可以重试或直接手动填写',
           }
         : item))

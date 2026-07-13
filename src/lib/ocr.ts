@@ -3,7 +3,10 @@ import { createWorker, OEM, PSM, type Worker } from 'tesseract.js'
 let activeProgress: ((progress: number) => void) | null = null
 let workerPromise: Promise<Worker> | null = null
 
-const OCR_TIMEOUT_MS = 45_000
+const OCR_TIMEOUT_MS = 75_000
+const MAX_PAGE_WIDTH = 1_100
+const MAX_PAGE_HEIGHT = 1_800
+const AMOUNT_PATTERN = /[\u00a5￥]?\s*[-−—]?\s*\d[\d,]*[.。]\d{2}/
 
 const progressByStatus: Record<string, [number, number]> = {
   'loading tesseract core': [0.02, 0.1],
@@ -55,12 +58,36 @@ const makeAmountCrop = async (file: File): Promise<Blob | null> => {
   }
 }
 
+const preparePageImage = async (file: File): Promise<Blob | File> => {
+  if (!globalThis.createImageBitmap) return file
+  const bitmap = await createImageBitmap(file)
+  try {
+    const scale = Math.min(
+      1,
+      MAX_PAGE_WIDTH / bitmap.width,
+      MAX_PAGE_HEIGHT / bitmap.height,
+    )
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale))
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale))
+    const context = canvas.getContext('2d')
+    if (!context) return file
+    context.filter = 'grayscale(1) contrast(1.35)'
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+    return await new Promise<Blob | File>((resolve) => {
+      canvas.toBlob((blob) => resolve(blob ?? file), 'image/png')
+    })
+  } finally {
+    bitmap.close()
+  }
+}
+
 const getWorker = () => {
   if (!workerPromise) {
     const langPath = new URL('tessdata-fast', document.baseURI).href.replace(/\/$/, '')
     const workerPath = new URL('ocr/worker.min.js', document.baseURI).href
-    const corePath = new URL('ocr/tesseract-core-lstm.wasm.js', document.baseURI).href
-    workerPromise = createWorker(['chi_sim', 'eng'], OEM.LSTM_ONLY, {
+    const corePath = new URL('ocr', document.baseURI).href.replace(/\/$/, '')
+    workerPromise = createWorker('chi_sim', OEM.LSTM_ONLY, {
       langPath,
       workerPath,
       corePath,
@@ -72,7 +99,7 @@ const getWorker = () => {
       },
     }).then(async (worker) => {
       await worker.setParameters({
-        tessedit_pageseg_mode: PSM.AUTO,
+        tessedit_pageseg_mode: PSM.SPARSE_TEXT,
         preserve_interword_spaces: '1',
       })
       return worker
@@ -95,12 +122,15 @@ export const recognizePaymentScreenshot = async (file: File, onProgress: (progre
   try {
     return await withTimeout((async () => {
       const worker = await getWorker()
+      const preparedImage = await preparePageImage(file)
       await worker.setParameters({
-        tessedit_pageseg_mode: PSM.AUTO,
+        tessedit_pageseg_mode: PSM.SPARSE_TEXT,
         preserve_interword_spaces: '1',
         tessedit_char_whitelist: '',
       })
-      const { data } = await worker.recognize(file)
+      const { data } = await worker.recognize(preparedImage)
+      if (AMOUNT_PATTERN.test(data.text)) return data.text
+
       const amountCrop = await makeAmountCrop(file)
       if (!amountCrop) return data.text
 

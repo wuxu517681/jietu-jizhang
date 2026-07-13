@@ -29,5 +29,9 @@ fs.copyFileSync(
   path.join(coreRoot, 'tesseract-core-lstm.wasm.js'),
   path.join(ocrTargetDir, 'tesseract-core-lstm.wasm.js'),
 )
+fs.copyFileSync(
+  path.join(coreRoot, 'tesseract-core-simd-lstm.wasm.js'),
+  path.join(ocrTargetDir, 'tesseract-core-simd-lstm.wasm.js'),
+)
 
 console.log('Lightweight OCR assets are ready.')
