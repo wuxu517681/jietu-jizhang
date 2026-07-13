@@ -1,4 +1,4 @@
-const CACHE_NAME = 'screenshot-ledger-v2'
+const CACHE_NAME = 'screenshot-ledger-v3'
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -8,8 +8,8 @@ const CORE_ASSETS = [
   './icons/apple-touch-icon.png',
   './ocr/worker.min.js',
   './ocr/tesseract-core-lstm.wasm.js',
-  './tessdata/chi_sim.traineddata.gz',
-  './tessdata/eng.traineddata.gz',
+  './tessdata-fast/chi_sim.traineddata.gz',
+  './tessdata-fast/eng.traineddata.gz',
 ]
 
 const scopedUrl = (path) => new URL(path, self.registration.scope).href
